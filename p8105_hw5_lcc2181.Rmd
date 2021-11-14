@@ -1,0 +1,13 @@
+---
+title: "p8105_hw5_lcc2181"
+output: github_document
+---
+
+Loading the packages needed for Homework 5.
+
+```{r, message=FALSE}
+library(tidyverse)
+```
+
+## Problem 1
+
