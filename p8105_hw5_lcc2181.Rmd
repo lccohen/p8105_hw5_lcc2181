@@ -7,7 +7,57 @@ Loading the packages needed for Homework 5.
 
 ```{r, message=FALSE}
 library(tidyverse)
+library(purrr)
 ```
 
 ## Problem 1
 
+## Problem 2
+
+Creating a dataframe with all file names using the `list.files` function.
+
+```{r}
+file_names = list.files(path = "data/problem2", full.names = TRUE)
+```
+
+Iterating over file names and reading in data for each subject using `map:dfr` to produce a single data frame.
+
+```{r, message=FALSE}
+p2_df =
+  tibble(
+    file_names,
+    map_dfr(file_names, read_csv)
+  )
+```
+
+Tidying the resulting data frame:
+
+* Manipulating file names separate control arm and subject id into their own columns and removing all other aspects of file name
+* Tidying weekly observations to ensure that each observation for each week is in a separate row for each participant.
+
+```{r}
+p2_tidy_df =
+  p2_df %>% 
+  separate(file_names, into = c("folder_1", "folder_2", "name"), sep = "/") %>% 
+  separate(name, into = c("control_arm", "other"), sep = "_") %>% 
+  separate(other, into = c("subject_id", "file_type")) %>% 
+  select(-folder_1, -folder_2, -file_type) %>% 
+  pivot_longer (
+    week_1:week_8,
+    names_to = "week",
+    names_prefix = "week_",
+    values_to = "observation"
+  )
+```
+
+Creating a spaghetti plot with observations for each subject across 8 weeks...
+
+```{r}
+p2_tidy_df %>% 
+  mutate(unique_id = paste(control_arm, subject_id)) %>% 
+  ggplot(aes(x = week, y = observation, group = unique_id, color = control_arm)) +
+  geom_line() +
+  theme(legend.position = "bottom")
+```
+
+At week 1, there do not appear to be major differences between subjects in the control arm and the experimental arm. Over time, observations for those in the experimental arm generally appear to increase; the same pattern is not apparent for those in the control arm. By week 8, all subjects in the experimental group have higher observations compared to those in the control group.
