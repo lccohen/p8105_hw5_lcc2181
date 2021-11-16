@@ -152,7 +152,7 @@ Creating a spaghetti plot with observations for each subject across 8 weeks...
 
 ```{r}
 p2_tidy_df %>% 
-  mutate(unique_id = paste(control_arm, subject_id)) %>% 
+  mutate(unique_id = str_c(control_arm, subject_id)) %>% 
   ggplot(aes(x = week, y = observation, group = unique_id, color = control_arm)) +
   geom_line() +
   theme(legend.position = "bottom")
@@ -198,6 +198,14 @@ replace_missing = function(x) {
 Using `map_dfr` to apply function `replace_missing` to columns of iris_with_missing.
 
 ```{r}
-output = map_dfr(iris_with_missing, replace_missing)
+iris_replaced_df = map_dfr(iris_with_missing, replace_missing)
+```
+
+The following code shows there are no missing values in the data frame after the function was applied.
+
+```{r}
+iris_replaced_df %>% 
+  is.na.data.frame() %>% 
+  sum()
 ```
 
